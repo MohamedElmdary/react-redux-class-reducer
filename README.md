@@ -13,16 +13,105 @@ npm install --save react-redux-class-reducer
 ## Usage
 
 ```tsx
-import React, { Component } from 'react'
+// index.tsx
+import React from 'react'
+import { createStore } from 'redux'
+import { COUNTER, initState } from './store'
+// COUNTER = '[COUNTER]';
+// initState = {value: 0};
 
-import MyComponent from 'react-redux-class-reducer'
-import 'react-redux-class-reducer/dist/index.css'
+// lib
+import {
+  createReducer,
+  createReactReduxClassReducerMiddleware
+} from 'react-redux-class-reducer'
 
-class Example extends Component {
-  render() {
-    return <MyComponent />
+const reactReduxClassReducerMiddleware =
+  /* pass what ever you want as extraArgs */
+  createReactReduxClassReducerMiddleware({ min: 0 })
+
+const store = createStore(
+  combineReducers({
+    counter: createReducer(COUNTER, initState)
+  }),
+  applyMiddleware(reactReduxClassReducerMiddleware)
+)
+
+ReactDOM.render(
+  <Provider store={store}>
+    <App />
+  </Provider>,
+  document.getElementById('root')
+)
+```
+
+```tsx
+// actions.ts
+import { Type } from 'react-redux-class-reducer'
+
+export const COUNTER = '[COUNTER]'
+export interface CounterState {
+  value: number
+}
+export const initState: CounterState = { value: 0 }
+
+export class IncrementCounter {
+  [Type] = COUNTER
+  type = 'INCREMENT_COUNTER'
+
+  constructor(public by: number = 1) {}
+
+  reduce(state: CounterState): CounterState {
+    return { ...state, value: state.value + this.by }
   }
 }
+
+export class DecrementCounter {
+  [Type] = COUNTER
+  type = 'DECREMENT_COUNTER'
+
+  reduce(
+    state: CounterState,
+    { deafultBy }: { deafultBy: number }
+  ): CounterState {
+    return { ...state, value: state.value - deafultBy }
+  }
+}
+```
+
+```tsx
+// app.tsx
+import React from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import {
+  CounterState,
+  IncrementCounter,
+  DecrementCounter
+} from './store/counterActions'
+
+const App = () => {
+  const counter = useSelector((s: { counter: CounterState }) => s.counter.value)
+  const dispatch = useDispatch()
+
+  return (
+    <div>
+      <h1>counter example</h1>
+      <div>
+        <p>Counter: {counter}</p>
+      </div>
+      <div>
+        <button onClick={() => dispatch(new IncrementCounter(5))}>
+          increment by 5
+        </button>
+        <button onClick={() => dispatch(new DecrementCounter())}>
+          decrement by 1
+        </button>
+      </div>
+    </div>
+  )
+}
+
+export default App
 ```
 
 ## License
