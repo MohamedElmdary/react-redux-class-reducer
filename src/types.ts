@@ -1,9 +1,10 @@
 import { Type } from './constants'
 
-interface Action<T = any> {
+interface Action<T = any, R = any> {
   [Type]: string
   type: string
-  reduce(state: T): T
+  args: R
+  reduce(state: T, args: R): T
 }
 
 export { Action }

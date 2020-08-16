@@ -4,7 +4,7 @@ import { Type } from './constants'
 function createReducer<T>(prefix: string, initState: T) {
   return (state = initState, action: Action<T>) => {
     if (action[Type] === prefix) {
-      return action.reduce(state)
+      return action.reduce(state, action.args)
     }
 
     return state
