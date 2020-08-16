@@ -7,37 +7,40 @@
 ## Install
 
 ```bash
-npm install --save react-redux-class-reducer
+$ npm install --save react-redux-class-reducer
 ```
 
 ## Usage
 
 ```tsx
-// index.tsx
-import React from 'react'
-import { createStore } from 'redux'
-import { COUNTER, initState } from './store'
-// COUNTER = '[COUNTER]';
-// initState = {value: 0};
-
-// lib
 import {
   createReducer,
   createReactReduxClassReducerMiddleware
 } from 'react-redux-class-reducer'
+// ...
 
+// create middleware
 const reactReduxClassReducerMiddleware =
   /* pass what ever you want as extraArgs */
-  createReactReduxClassReducerMiddleware({ min: 0 })
+  createReactReduxClassReducerMiddleware({ defaultBy: 0 })
 
+// create counter reducer
+const counterReducer =
+  // pass what ever prefix you would like e.g '@Counter'
+  createReducer('[COUNTER]', { value: 0 })
+
+// create redux store
 const store = createStore(
   combineReducers({
-    counter: createReducer(COUNTER, initState)
+    // passing the reducer
+    counter: counterReducer
   }),
+  // applying the middleware
   applyMiddleware(reactReduxClassReducerMiddleware)
 )
 
 ReactDOM.render(
+  // passing the redux store as normal
   <Provider store={store}>
     <App />
   </Provider>,
@@ -49,19 +52,17 @@ ReactDOM.render(
 // actions.ts
 import { Type } from 'react-redux-class-reducer'
 
-export const COUNTER = '[COUNTER]'
-export interface CounterState {
-  value: number
-}
-export const initState: CounterState = { value: 0 }
-
 export class IncrementCounter {
-  [Type] = COUNTER
+  // very important [Type] = Prefix
+  [Type] = '[COUNTER]'
   type = 'INCREMENT_COUNTER'
 
+  // you can pass any require data in constructor (ts features)
   constructor(public by: number = 1) {}
 
+  // reduce fn take state, extraArgs => state
   reduce(state: CounterState): CounterState {
+    // use this to access the action values
     return { ...state, value: state.value + this.by }
   }
 }
@@ -72,6 +73,7 @@ export class DecrementCounter {
 
   reduce(
     state: CounterState,
+    // access deafultArgs
     { deafultBy }: { deafultBy: number }
   ): CounterState {
     return { ...state, value: state.value - deafultBy }
@@ -93,6 +95,8 @@ const App = () => {
   const counter = useSelector((s: { counter: CounterState }) => s.counter.value)
   const dispatch = useDispatch()
 
+  /* dispatching actions */
+
   return (
     <div>
       <h1>counter example</h1>
@@ -100,7 +104,11 @@ const App = () => {
         <p>Counter: {counter}</p>
       </div>
       <div>
-        <button onClick={() => dispatch(new IncrementCounter(5))}>
+        <button
+          onClick={() => {
+            dispatch(new IncrementCounter(5))
+          }}
+        >
           increment by 5
         </button>
         <button onClick={() => dispatch(new DecrementCounter())}>
