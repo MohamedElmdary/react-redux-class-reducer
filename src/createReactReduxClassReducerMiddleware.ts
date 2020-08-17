@@ -6,17 +6,18 @@ import { isString } from './guards'
 function createReactReduxClassReducerMiddleware<T>(args: T = Obj): Middleware {
   return ({ dispatch, getState }) => (next) => (action) => {
     if (isString(action[Type])) {
-      if (isString(action.type)) {
+      if (isString(action.$$type)) {
         if (typeof action.reduce === 'function') {
-          if (action.async === true) {
+          if (action.$$async === true) {
             return action.reduce(dispatch, getState(), args)
           }
 
           return next({
             ...action,
+            [Type]: action[Type],
+            type: action.$$type,
             reduce: action.reduce,
-            args,
-            dispatch
+            args
           })
         } else {
           throw new Error(
