@@ -9,6 +9,9 @@ import {
 
 const App = () => {
   const counter = useSelector((s: { counter: CounterState }) => s.counter.value)
+  const loading = useSelector(
+    (s: { counter: CounterState }) => s.counter.loading
+  )
   const dispatch = useDispatch()
 
   return (
@@ -16,6 +19,7 @@ const App = () => {
       <h1>counter example</h1>
       <div>
         <p>Counter: {counter}</p>
+        {loading ? <p>loading...</p> : null}
       </div>
       <div>
         <button onClick={() => dispatch(new AsyncIncrement())}>

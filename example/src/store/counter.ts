@@ -7,12 +7,13 @@ export interface CounterState {
 }
 export const initState: CounterState = { value: 0, loading: false }
 
-// const Counter = Action('counter')
+const Counter = Action('counter')
 
-@Action({
-  prefix: 'counter',
-  type: 'Increment'
-})
+// @Action({
+//   prefix: 'counter',
+//   type: 'Increment'
+// })
+@Counter('Increment')
 export class Increment {
   constructor(public by: number = 1) {}
 
@@ -21,10 +22,11 @@ export class Increment {
   }
 }
 
-@Action({
-  prefix: 'counter',
-  type: 'Decrement'
-})
+// @Action({
+//   prefix: 'counter',
+//   type: 'Decrement'
+// })
+@Counter('Decrement')
 export class Decrement {
   reduce(
     state: CounterState,
@@ -34,8 +36,12 @@ export class Decrement {
   }
 }
 
-@Action({
-  prefix: 'counter',
+// @Action({
+//   prefix: 'counter',
+//   type: 'ASYNC_INCREMENT',
+//   async: true
+// })
+@Counter({
   type: 'ASYNC_INCREMENT',
   async: true
 })
@@ -43,13 +49,13 @@ export class AsyncIncrement {
   constructor(public ms: number = 1000, public by: number = 1) {}
 
   reduce(dispatch: Dispatch<any>) {
-    console.log(dispatch(new Increment()))
+    // console.log(dispatch(new Increment()))
 
-    // dispatch(new SetLoading(true))
-    // setTimeout(() => {
-    //   dispatch(new SetLoading(false))
-    //   dispatch(new Increment(this.by))
-    // }, this.ms)
+    dispatch(new SetLoading(true))
+    setTimeout(() => {
+      dispatch(new SetLoading(false))
+      dispatch(new Increment(this.by))
+    }, this.ms)
   }
 }
 

@@ -1,16 +1,17 @@
 import { Middleware } from 'redux'
+
 import { Type, Obj } from './constants'
+import { isString } from './guards'
 
 function createReactReduxClassReducerMiddleware<T>(args: T = Obj): Middleware {
   return ({ dispatch, getState }) => (next) => (action) => {
-    console.log('action', action)
-
-    if (typeof action[Type] === 'string') {
-      if (typeof action.type === 'string') {
+    if (isString(action[Type])) {
+      if (isString(action.type)) {
         if (typeof action.reduce === 'function') {
           if (action.async === true) {
-            return action.reduce(dispatch, getState())
+            return action.reduce(dispatch, getState(), args)
           }
+
           return next({
             ...action,
             reduce: action.reduce,
