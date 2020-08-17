@@ -1,10 +1,6 @@
 import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import {
-  CounterState,
-  IncrementCounter,
-  DecrementCounter
-} from './store/counterActions'
+import { CounterState, Increment, Decrement } from './store/counter'
 
 const App = () => {
   const counter = useSelector((s: { counter: CounterState }) => s.counter.value)
@@ -17,10 +13,10 @@ const App = () => {
         <p>Counter: {counter}</p>
       </div>
       <div>
-        <button onClick={() => dispatch(new IncrementCounter(5))}>
+        <button onClick={() => dispatch(new Increment(5))}>
           increment by 5
         </button>
-        <button onClick={() => dispatch(new DecrementCounter())}>
+        <button onClick={() => dispatch(new Decrement())}>
           decrement by 1
         </button>
       </div>

@@ -5,7 +5,7 @@ import ReactDOM from 'react-dom'
 import App from './App'
 import { createStore, combineReducers, applyMiddleware } from 'redux'
 import { Provider } from 'react-redux'
-import { COUNTER, initState } from './store/counterActions'
+import { initState } from './store/counter'
 
 // lib
 import {
@@ -18,7 +18,7 @@ const reactReduxClassReducerMiddleware = createReactReduxClassReducerMiddleware(
 )
 const store = createStore(
   combineReducers({
-    counter: createReducer(COUNTER, initState)
+    counter: createReducer('counter', initState)
   }),
   applyMiddleware(reactReduxClassReducerMiddleware)
 )

@@ -1,15 +1,14 @@
-import { Type } from 'react-redux-class-reducer'
+import { Action } from 'react-redux-class-reducer'
 
-export const COUNTER = '[COUNTER]'
 export interface CounterState {
   value: number
 }
 export const initState: CounterState = { value: 0 }
 
-export class IncrementCounter {
-  [Type] = COUNTER
-  type = 'INCREMENT_COUNTER'
+const Counter = Action('counter')
 
+@Counter('INCREMENT')
+export class Increment {
   constructor(public by: number = 1) {}
 
   reduce(state: CounterState): CounterState {
@@ -17,10 +16,8 @@ export class IncrementCounter {
   }
 }
 
-export class DecrementCounter {
-  [Type] = COUNTER
-  type = 'DECREMENT_COUNTER'
-
+@Counter('DECREMENT')
+export class Decrement {
   reduce(
     state: CounterState,
     { deafultBy }: { deafultBy: number }
