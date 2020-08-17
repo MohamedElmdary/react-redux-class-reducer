@@ -1,6 +1,6 @@
 {
   "name": "react-redux-class-reducer",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A redux middleware to replace the regular reduer with a class based one removing some of the boilerplate code.",
   "author": "MohamedElmdary",
   "license": "MIT",

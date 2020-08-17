@@ -10,24 +10,134 @@
 $ npm install --save react-redux-class-reducer
 ```
 
+## API
+
+---
+
+### createReactReduxClassReducerMiddleware
+
+```ts
+ createReactReduxClassReducerMiddleware(extraArgs?): Function
+```
+
+**Parameters:**
+| NAME | TYPE | REQUIRED | DESCRIPTION |
+|:---------:|:----:|:--------:|:-------------------------------------------:|
+| extraArgs | any | false | Data will be passed to your reduce function |
+| | | | |
+
+### createReducer
+
+```ts
+ createReducer(prefix, initState): Function
+```
+
+**Parameters:**
+
+|   NAME    |  TYPE  | REQUIRED |                                                 DESCRIPTION                                                 |
+| :-------: | :----: | :------: | :---------------------------------------------------------------------------------------------------------: |
+|  prefix   | string |   true   | String indicating the name of the reducer used to check whether this reduce should call the action of not\. |
+| initState |  any   |   true   |                                        Initial state of that reducer                                        |
+|           |        |          |                                                                                                             |
+
+### Action
+
+```ts
+ Action(prefix, type?, async?): (() => ClassDecorator) | ClassDecorator
+```
+
+**Parameters:**
+| NAME | TYPE | REQUIRED | DESCRIPTION |
+|:------:|:-------------------------------------------------------------:|:--------:|:-------------------------------------------:|
+| prefix | string \| \{prefix: string, type: string, async?: boolean\} | true | Data will be passed to your reduce function |
+| type | string \| \{ type: string async?: boolean \} \| undefined | false | type of action |
+| async | boolean \| undefined | false | if is async action \| deafult: false |
+| | | | |
+
 ## Usage
 
 ```tsx
+// actions.ts
+import { Action } from 'react-redux-class-reducer'
+import { Dispatch } from 'react'
+
+// passing string only return (type) => class Decrator
+export const counterPrefix = 'counter'
+const Counter = Action('counter')
+
+export interface CounterState {
+  value: number
+  loading: boolean
+}
+
+export const counterInitState: CounterState = {
+  value: 0,
+  loading: false
+}
+
+@Counter('Increment')
+export class Increment {
+  reduce(state: CounterState): CounterState {
+    return { ...state, value: state.value + 1 }
+  }
+}
+
+@Counter('Decrement')
+export class Decrement {
+  constructor(public by: number) {}
+
+  reduce(state: CounterState): CounterState {
+    return { ...state, value: state.value - this.by }
+  }
+}
+
+@Counter('Set_Loading')
+export class SetLoading {
+  constructor(public value: boolean) {}
+
+  reduce(state: CounterState): CounterState {
+    return { ...state, loading: this.value }
+  }
+}
+
+@Counter({
+  type: 'Async_Increment',
+  async: true // important for async actions
+})
+export class AsyncIncrement {
+  constructor(public ms: number = 1000 /* 1s */) {}
+
+  reduce(dispatch: Dispatch<any>) {
+    dispatch(new SetLoading(true))
+
+    setTimeout(() => {
+      dispatch(new SetLoading(false))
+      dispatch(new Increment())
+    }, this.ms)
+  }
+}
+```
+
+```tsx
+// index.tsx
 import {
   createReducer,
   createReactReduxClassReducerMiddleware
 } from 'react-redux-class-reducer'
+import { counterInitState, counterPrefix } from './store/counter'
 // ...
 
 // create middleware
 const reactReduxClassReducerMiddleware =
   /* pass what ever you want as extraArgs */
-  createReactReduxClassReducerMiddleware({ defaultBy: 0 })
+  createReactReduxClassReducerMiddleware({
+    /* pass what ever you want */
+  })
 
 // create counter reducer
 const counterReducer =
   // pass what ever prefix you would like e.g '@Counter'
-  createReducer('[COUNTER]', { value: 0 })
+  createReducer(counterPrefix, counterInitState)
 
 // create redux store
 const store = createStore(
@@ -39,46 +149,7 @@ const store = createStore(
   applyMiddleware(reactReduxClassReducerMiddleware)
 )
 
-ReactDOM.render(
-  // passing the redux store as normal
-  <Provider store={store}>
-    <App />
-  </Provider>,
-  document.getElementById('root')
-)
-```
-
-```tsx
-// actions.ts
-import { Type } from 'react-redux-class-reducer'
-
-export class IncrementCounter {
-  // very important [Type] = Prefix
-  [Type] = '[COUNTER]'
-  type = 'INCREMENT_COUNTER'
-
-  // you can pass any require data in constructor (ts features)
-  constructor(public by: number = 1) {}
-
-  // reduce fn take state, extraArgs => state
-  reduce(state: CounterState): CounterState {
-    // use this to access the action values
-    return { ...state, value: state.value + this.by }
-  }
-}
-
-export class DecrementCounter {
-  [Type] = COUNTER
-  type = 'DECREMENT_COUNTER'
-
-  reduce(
-    state: CounterState,
-    // access deafultArgs
-    { deafultBy }: { deafultBy: number }
-  ): CounterState {
-    return { ...state, value: state.value - deafultBy }
-  }
-}
+// ...
 ```
 
 ```tsx
@@ -88,11 +159,15 @@ import { useSelector, useDispatch } from 'react-redux'
 import {
   CounterState,
   IncrementCounter,
-  DecrementCounter
+  DecrementCounter,
+  AsyncIncrement
 } from './store/counterActions'
 
 const App = () => {
   const counter = useSelector((s: { counter: CounterState }) => s.counter.value)
+  const counter = useSelector(
+    (s: { counter: CounterState }) => s.counter.loading
+  )
   const dispatch = useDispatch()
 
   /* dispatching actions */
@@ -106,13 +181,16 @@ const App = () => {
       <div>
         <button
           onClick={() => {
-            dispatch(new IncrementCounter(5))
+            dispatch(new IncrementCounter())
           }}
         >
-          increment by 5
+          increment by 1
         </button>
-        <button onClick={() => dispatch(new DecrementCounter())}>
-          decrement by 1
+        <button onClick={() => dispatch(new DecrementCounter(5))}>
+          decrement by 5
+        </button>
+        <button onClick={() => dispatch(new AsyncIncrement())}>
+          increment by 1 after 1 sec
         </button>
       </div>
     </div>
