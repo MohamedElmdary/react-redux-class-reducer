@@ -2,14 +2,20 @@ import { Middleware } from 'redux'
 import { Type, Obj } from './constants'
 
 function createReactReduxClassReducerMiddleware<T>(args: T = Obj): Middleware {
-  return (_) => (dispatch) => (action) => {
+  return ({ dispatch, getState }) => (next) => (action) => {
+    console.log('action', action)
+
     if (typeof action[Type] === 'string') {
       if (typeof action.type === 'string') {
         if (typeof action.reduce === 'function') {
-          return dispatch({
+          if (action.async === true) {
+            return action.reduce(dispatch, getState())
+          }
+          return next({
             ...action,
             reduce: action.reduce,
-            args
+            args,
+            dispatch
           })
         } else {
           throw new Error(
@@ -23,7 +29,7 @@ function createReactReduxClassReducerMiddleware<T>(args: T = Obj): Middleware {
       }
     }
 
-    return dispatch(action)
+    return next(action)
   }
 }
 
