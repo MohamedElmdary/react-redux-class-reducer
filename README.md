@@ -24,7 +24,6 @@ $ npm install --save react-redux-class-reducer
 | NAME | TYPE | REQUIRED | DESCRIPTION |
 |:---------:|:----:|:--------:|:-------------------------------------------:|
 | extraArgs | any | false | Data will be passed to your reduce function |
-| | | | |
 
 ### createReducer
 
@@ -38,7 +37,6 @@ $ npm install --save react-redux-class-reducer
 | :-------: | :----: | :------: | :---------------------------------------------------------------------------------------------------------: |
 |  prefix   | string |   true   | String indicating the name of the reducer used to check whether this reduce should call the action of not\. |
 | initState |  any   |   true   |                                        Initial state of that reducer                                        |
-|           |        |          |                                                                                                             |
 
 ### Action
 
@@ -52,7 +50,6 @@ $ npm install --save react-redux-class-reducer
 | prefix | string \| \{prefix: string, type: string, async?: boolean\} | true | Data will be passed to your reduce function |
 | type | string \| \{ type: string async?: boolean \} \| undefined | false | type of action |
 | async | boolean \| undefined | false | if is async action \| deafult: false |
-| | | | |
 
 ## Usage
 
